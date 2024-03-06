@@ -1,5 +1,4 @@
 //SPDX-License-Identifier: MIT
-
 pragma solidity 0.8.20;
 
 contract Proxy {
@@ -63,7 +62,7 @@ contract Proxiable {
     }
 }
 
-contract MyContract {
+contract MyContract is Proxiable {
     address public owner;
     uint256 public totalVoter;
 
@@ -79,6 +78,11 @@ contract MyContract {
     mapping(uint256 => vote) private votes;
     mapping(address => voter) private voterRegister;
 
+    modifier onlyOwner() {
+        require(owner == address(0), "Already initalized");
+        _;
+    }
+
     function constructor1() public {
         require(owner == address(0), "Already initalized");
         owner = msg.sender;
@@ -87,7 +91,7 @@ contract MyContract {
     function addVoter(address _voterAddress, string memory _voterName) public {
         voter memory v;
         v.voterName = _voterName;
-        v.voted = true;
+        v.voted = false;
         voterRegister[_voterAddress] = v;
         totalVoter++;
     }
@@ -101,15 +105,12 @@ contract MyContract {
         voterRegister[_voterAddress] = v;
         totalVoter--;
     }
-}
 
-contract MyFinalContract is MyContract, Proxiable {
     function updateCode(address newCode) public onlyOwner {
         updateCodeAddress(newCode);
     }
-
-    modifier onlyOwner() {
-        require(owner == address(0), "Already initalized");
-        _;
-    }
 }
+
+// first deploy MyContract then Proxy
+// web3.utils.sha3('constructor1()').substring(0,10)
+

@@ -26,42 +26,7 @@ contract Storage {
     }
 }
 
-library StorageLib {
-    function setXVar(address storageContractAddress, uint256 value) public {
-        Storage(storageContractAddress).setUintVars(keccak256("x"), value);
-    }
-
-    function getXVar(address storageContractAddress)
-        public
-        view
-        returns (uint256)
-    {
-        return Storage(storageContractAddress).getUintVarsValue(keccak256("x"));
-    }
-
-    function setUserNameVar(address storageContractAddress, string memory value)
-        public
-    {
-        Storage(storageContractAddress).setStringVars(
-            keccak256("Username"),
-            value
-        );
-    }
-
-    function getUserNameVar(address storageContractAddress)
-        public
-        view
-        returns (string memory)
-    {
-        return
-            Storage(storageContractAddress).getStringVarsValue(
-                keccak256("Username")
-            );
-    }
-}
-
 contract LogicContract {
-    using StorageLib for address;
     address storageAddr;
 
     constructor(address storageContractAddress) {
@@ -70,18 +35,18 @@ contract LogicContract {
 
     function addX(uint256 a, uint256 b) public {
         uint256 x = a + b;
-        storageAddr.setXVar(x);
+        Storage(storageAddr).setUintVars(keccak256("x"), x);
     }
 
     function getX() public view returns (uint256) {
-        return storageAddr.getXVar();
+        return Storage(storageAddr).getUintVarsValue(keccak256("x"));
     }
 
     function setUserName(string memory name) public {
-        storageAddr.setUserNameVar(name);
+        Storage(storageAddr).setStringVars(keccak256("Username"), name);
     }
 
     function getuserName() public view returns (string memory) {
-        return storageAddr.getUserNameVar();
+        return Storage(storageAddr).getStringVarsValue(keccak256("Username"));
     }
 }
